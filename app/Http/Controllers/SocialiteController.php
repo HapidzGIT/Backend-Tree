@@ -44,7 +44,6 @@ class SocialiteController extends Controller
 
             // Mengembalikan token API
             return response()->json(['token' => $user->createToken('API Token')->plainTextToken]);
-
         } catch (\Exception $e) {
             // Log kesalahan
             Log::error('Socialite error: ' . $e->getMessage());
