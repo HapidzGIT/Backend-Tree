@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Session\Middleware\StartSession;
 
@@ -43,13 +44,22 @@ class SocialiteController extends Controller
             Auth::login($user);
 
             // Mengembalikan token API
-            return response()->json(['token' => $user->createToken('API Token')->plainTextToken]);
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            // Mengembalikan respons JSON dengan data pengguna
+            return response()->json([
+                'token' => $token,
+                'role' => $user->role,
+                'username' => $user->username,
+                'email' => $user->email,
+            ]);
         } catch (\Exception $e) {
             // Log kesalahan
             Log::error('Socialite error: ' . $e->getMessage());
-            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+            return response()->json(['error' => 'Invalid credentials provided.'], 401);
         }
     }
+
 
     public function __construct()
     {
