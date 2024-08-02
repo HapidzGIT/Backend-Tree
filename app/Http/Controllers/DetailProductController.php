@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class DetailProductController extends Controller
 {
-    public function index () 
+    public function index ()
     {
         $details = DetailProduct::with('product')->get();
         return DetailProductResource::Collection($details);
@@ -43,14 +43,14 @@ class DetailProductController extends Controller
         ]);
 
     }
-
+    
     public function show($id)
     {
         $detail = DetailProduct::with('product')->findOrFail($id);
         return new DetailProductResource($detail);
     }
 
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
 {
     $detail = DetailProduct::findOrFail($id);
 
@@ -66,7 +66,7 @@ class DetailProductController extends Controller
     }
 
     $detail->update($request->only('description'));
-    
+
     // Log::info('Updated Detail:', $detail->toArray());
 
     $detail->refresh();
