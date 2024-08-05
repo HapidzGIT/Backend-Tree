@@ -32,10 +32,12 @@ class OrderController extends Controller
         $orders = Order::where('users_id', auth()->id())->get();
         return OrderResource::collection($orders);
     }
-
     public function store(Request $request)
     {
-        // Validate received data
+        // Log data request untuk debugging
+        Log::info('Request data:', $request->all());
+
+        // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
         ]);
