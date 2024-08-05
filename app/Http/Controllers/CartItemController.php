@@ -32,16 +32,16 @@ class CartItemController extends Controller
 
         // Periksa apakah item keranjang sudah ada untuk produk dan pengguna yang sama
         $existingCartItem = CartItem::where('users_id', auth()->id())
-                                    ->where('products_id', $validatedData['products_id'])
-                                    ->first();
+            ->where('products_id', $validatedData['products_id'])
+            ->first();
 
-        if (!$existingCartItem) {
-            // Jika item keranjang belum ada, buat item keranjang baru
-            $cartItem = CartItem::create($validatedData);
-        } else {
-            // Jika item sudah ada, Anda bisa memilih untuk tidak melakukan apa-apa atau menangani duplikasi
-            return response()->json(['message' => 'Product is already in the cart'], 200);
+        if ($existingCartItem) {
+            // Jika item sudah ada, kembalikan pesan kesalahan
+            return response()->json(['message' => 'Product is already in the cart'], 409);
         }
+
+        // Jika item keranjang belum ada, buat item keranjang baru
+        $cartItem = CartItem::create($validatedData);
 
         // Kembalikan response
         return new CartItemResource($cartItem);

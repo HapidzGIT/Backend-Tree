@@ -10,66 +10,77 @@ class WishlistController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api'); // Pastikan middleware otentikasi digunakan
+        $this->middleware('auth:api'); // Ensure authentication middleware is used
     }
 
     public function index()
     {
-        // Ambil semua wishlist yang terkait dengan pengguna yang sedang login
+        // Get all wishlists associated with the logged-in user
         $wishlists = Wishlist::where('users_id', auth()->id())->get();
         return WishlistResource::collection($wishlists);
     }
 
     public function store(Request $request)
     {
-        // Validasi data yang diterima
+        // Validate the incoming data
         $validated = $request->validate([
             'products_id' => 'required|exists:products,id',
         ]);
 
-        // Tambahkan users_id dari pengguna yang sedang login
+        // Check if the product already exists in the user's wishlist
+        $existingWishlist = Wishlist::where('users_id', auth()->id())
+            ->where('products_id', $validated['products_id'])
+            ->first();
+
+        if ($existingWishlist) {
+            return response()->json([
+                'message' => 'Product already exists in your wishlist',
+            ], 409); // Conflict status code
+        }
+
+        // Add users_id from the logged-in user
         $validated['users_id'] = auth()->id();
 
-        // Buat wishlist baru
+        // Create a new wishlist entry
         $wishlist = Wishlist::create($validated);
 
-        // Kembalikan response
+        // Return the response
         return new WishlistResource($wishlist);
     }
 
     public function show($id)
     {
-        // Ambil wishlist berdasarkan id dan pengguna yang sedang login
+        // Get the wishlist by id and logged-in user
         $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
         return new WishlistResource($wishlist);
     }
 
     public function update(Request $request, $id)
     {
-        // Validasi data yang diterima
+        // Validate the incoming data
         $validated = $request->validate([
             'products_id' => 'required|exists:products,id',
         ]);
 
-        // Tambahkan users_id dari pengguna yang sedang login
+        // Add users_id from the logged-in user
         $validated['users_id'] = auth()->id();
 
-        // Ambil wishlist yang akan diupdate
+        // Get the wishlist to be updated
         $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
 
-        // Update wishlist
+        // Update the wishlist
         $wishlist->update($validated);
 
-        // Kembalikan response
+        // Return the response
         return new WishlistResource($wishlist);
     }
 
     public function destroy($id)
     {
-        // Ambil wishlist yang akan dihapus
+        // Get the wishlist to be deleted
         $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
 
-        // Hapus wishlist
+        // Delete the wishlist
         $wishlist->delete();
 
         return response()->json([

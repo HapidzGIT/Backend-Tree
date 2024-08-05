@@ -18,8 +18,8 @@ class DetailProduct extends Model
     ];
 
     // Definisikan relasi ke model Product
-    public function product() 
+    public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class);
     }
 }

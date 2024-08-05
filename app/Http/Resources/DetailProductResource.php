@@ -17,12 +17,15 @@ class DetailProductResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
+            'name' => $this->product ? $this->product->name : null,
             'description' => $this->description,
-            // 'product' => $this->whenLoaded('products', function () {
-            //     return new ProductResource($this->product);
-            // }),
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
+            'merchant' => $this->product && $this->product->merchant,
+            'country_code' => $this->product->merchant->country_code,
+            'merchant_name' => $this->product->merchant->merchant_name,
+            'price' => $this->product ? $this->product->price : null,
+            'status' => $this->product ? $this->product->status : null,
+            'image_urls' => asset($this->image),
+
         ];
     }
 
